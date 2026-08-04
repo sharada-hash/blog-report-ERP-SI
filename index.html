@@ -3,20 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>台帳ブログ 月次モニタリング（共有版）</title>
+<title>ERP製品サイト 月次モニタリング（共有版）</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
 <style>
 :root { color-scheme: light; }
 * { box-sizing: border-box; }
-body { margin:0; padding:24px 22px 48px; font-family:-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif; background:#f6f7f9; color:#1c2330; font-size:14px; line-height:1.6; max-width:1100px; margin-left:auto; margin-right:auto; }
-h1 { font-size:21px; margin:0 0 2px; letter-spacing:.02em; }
+body { margin:0; padding:24px 22px 48px; font-family:-apple-system,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif; background:#f6f7f9; color:#1c2330; font-size:14px; line-height:1.6; max-width:1120px; margin-left:auto; margin-right:auto; }
+h1 { font-size:21px; margin:0 0 2px; }
 .sub { color:#6b7686; font-size:12.5px; margin-bottom:6px; }
 .sub b { color:#1c2330; }
-.badge { display:inline-block; font-size:11.5px; color:#5b6472; background:#eef1f6; border:1px solid #e0e5ee; padding:2px 10px; border-radius:20px; margin:2px 0 18px; }
-.grid-kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px; }
+.badge { display:inline-block; font-size:11.5px; color:#5b6472; background:#eef1f6; border:1px solid #e0e5ee; padding:2px 10px; border-radius:20px; margin:2px 0 16px; }
+.tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; border-bottom:2px solid #e6e9ef; padding-bottom:0; }
+.tab { appearance:none; border:1px solid #e6e9ef; border-bottom:none; background:#eef1f6; color:#5b6472; font-size:13px; font-weight:600; padding:9px 16px; border-radius:9px 9px 0 0; cursor:pointer; position:relative; top:2px; }
+.tab:hover { background:#e4e9f2; }
+.tab.active { background:#fff; color:#1c2330; border-color:#d3d9e4; box-shadow:0 -2px 0 #2f6df6 inset; }
+.grid-kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
 .card { background:#fff; border:1px solid #e6e9ef; border-radius:12px; padding:14px 16px; }
 .card .label { font-size:12px; color:#6b7686; margin-bottom:4px; }
-.card .val { font-size:26px; font-weight:700; }
+.card .val { font-size:25px; font-weight:700; }
 .card .mom { font-size:12px; margin-top:2px; }
 .up { color:#1a8a5a; } .down { color:#c0392b; } .flat { color:#8a94a3; }
 .panel { background:#fff; border:1px solid #e6e9ef; border-radius:12px; padding:16px 18px; margin-bottom:16px; }
@@ -28,67 +32,102 @@ h1 { font-size:21px; margin:0 0 2px; letter-spacing:.02em; }
 .notes { background:#fff8ec; border:1px solid #f0dfb8; border-radius:12px; padding:14px 18px; font-size:12.5px; }
 .notes h2 { font-size:13px; margin:0 0 8px; color:#8a6d1e; }
 .notes ul { margin:0; padding-left:18px; }
-.notes li { margin-bottom:6px; }
+.notes li { margin-bottom:5px; }
 .notes b { color:#7a5c12; }
 .foot { color:#9aa3b1; font-size:11.5px; margin-top:18px; text-align:right; }
 @media (max-width:760px){ .grid-kpi{grid-template-columns:repeat(2,1fr);} .row2{grid-template-columns:1fr;} }
 </style>
 </head>
 <body>
-<h1>台帳ブログ 月次モニタリング</h1>
-<div class="sub">SINT-ブログ台帳マスタ 掲載 <b>266記事</b>（旧 /backoffice/blog/ ＋ 新 /blog/ を合算）｜ 対象期間 <b>2026-01 〜 2026-06</b>（完了済み6ヶ月）</div>
+<h1>ERP製品サイト 月次モニタリング</h1>
+<div class="sub" id="sub">products.sint.co.jp ｜ GA4より集計 ｜ 対象期間 <b>2026-01 〜 2026-06</b>（完了済み6ヶ月・当月除く）</div>
 <div class="badge">🔒 閲覧専用の共有版 ｜ データ更新日 2026-07-29</div>
 
-<div class="grid-kpi">
-  <div class="card"><div class="label">最新月 (2026/06) 合計セッション</div><div class="val">6,780</div><div class="mom up">前月比 +19.8%</div></div>
-  <div class="card"><div class="label">うち 自然検索(Organic)</div><div class="val">5,303</div><div class="mom up">前月比 +9.7%</div></div>
-  <div class="card"><div class="label">うち AIアシスタント流入<br><span style="font-size:11px;color:#9aa3b1">GA4ネイティブ判定</span></div><div class="val">32</div><div class="mom up">前月比 +32</div></div>
-  <div class="card"><div class="label">対象ブログ記事数</div><div class="val">266</div><div class="mom flat">台帳マスタより</div></div>
-</div>
+<div class="tabs" id="tabs"></div>
+<div class="grid-kpi" id="kpis"></div>
 
-<div class="panel"><h2>月次セッション（旧URL / 新URL の受け渡し）<span class="tag">移設の可視化</span></h2><div class="chart-wrap"><canvas id="cHandoff"></canvas></div></div>
+<div class="panel" id="handoffPanel" style="display:none"><h2>月次セッション（旧URL / 新URL の受け渡し）<span class="tag">移設の可視化</span></h2><div class="chart-wrap"><canvas id="cHandoff"></canvas></div></div>
 
 <div class="row2">
-  <div class="panel"><h2>流入チャネル構成の推移<span class="tag">旧＋新 合算</span></h2><div class="chart-wrap"><canvas id="cStack"></canvas></div></div>
-  <div class="panel"><h2>最新月の流入内訳<span class="tag">2026/06</span></h2><div class="chart-wrap sm"><canvas id="cDonut"></canvas></div></div>
+  <div class="panel"><h2>流入チャネル構成の推移<span class="tag">6ヶ月</span></h2><div class="chart-wrap"><canvas id="cStack"></canvas></div></div>
+  <div class="panel"><h2 id="donutTitle">最新月の流入内訳</h2><div class="chart-wrap sm"><canvas id="cDonut"></canvas></div></div>
 </div>
 
-<div class="notes"><h2>⚠ 数字を読むときの注意</h2><ul>
-  <li><b>旧URL＋新URLの合算：</b>台帳ブログは 旧 <b>/backoffice/blog/</b> から 新 <b>/blog/</b> へ移設されました。両方を合算して連続した実力値を表示しています（上のグラフで5→6月の受け渡しが見えます）。</li>
-  <li><b>対象は台帳の新URL 266件：</b>旧URLは同一スラッグで自動対応。台帳で新URLが空欄の記事は対象外です。</li>
-  <li><b>社内アクセス未除外：</b>Teams・Zoom・HubSpot管理画面等からの閲覧を除外していないため、Direct が多めに出ます。</li>
-  <li><b>AIアシスタント：</b>GA4のネイティブ判定（ChatGPT/Perplexity/Gemini等）。参照元を持たない流入はDirectに混ざるため過小評価の可能性があります。</li>
-</ul></div>
-
+<div class="notes"><h2>⚠ 数字を読むときの注意</h2><ul id="notes"></ul></div>
 <div class="foot">出典：Google Analytics 4 ／ SINT-ブログ台帳マスタ｜このページはスナップショット（自動更新されません）</div>
 
 <script>
 const MONTHS = ["2026/01","2026/02","2026/03","2026/04","2026/05","2026/06"];
-// 旧URL / 新URL 月次合計
-const OLD_TOT = [6376, 6084, 6106, 6244, 4982, 0];
-const NEW_TOT = [0, 0, 0, 0, 677, 6780];
-// 旧＋新 合算・チャネル別（CH_ORDER順）
-const CH_ORDER = ["Organic Search","Direct","Email","Referral","AI Assistant","その他"];
-const CH_COLOR = ["#2f6df6","#00b4a6","#f5a524","#a06be0","#e0567a","#c2c8d2"];
-const CH_DATA = {
-  "Organic Search":[5715,5467,5327,5433,4833,5303],
-  "Direct":        [505, 441, 630, 611, 648, 1286],
-  "Email":         [2,   6,   5,   0,   2,   5],
-  "Referral":      [117, 157, 135, 173, 145, 124],
-  "AI Assistant":  [0,   0,   0,   0,   0,   32],
-  "その他":         [37,  13,  9,   27,  31,  30]
+const CH_ORDER = ["Organic Search","Direct","Email","Referral","Paid Social","AI Assistant","その他"];
+const CH_COLOR = ["#2f6df6","#00b4a6","#f5a524","#a06be0","#3fb56d","#e0567a","#c2c8d2"];
+
+const PRODUCTS = {
+  backoffice:{ label:"backoffice", desc:"/backoffice 配下（移設ブログ /backoffice/blog は除外）",
+    ch:{ "Organic Search":[41,32,27,28,16,27], "Direct":[76,45,71,63,65,338], "Email":[33,8,46,6,21,17], "Referral":[19,10,10,6,1,14], "Paid Social":[0,0,0,0,0,0], "AI Assistant":[0,0,0,0,0,0], "その他":[1,11,2,2,4,1] },
+    notes:["<b>移設ブログを除外：</b>/backoffice/blog 配下は「台帳ブログ」タブで別集計しているため、ここでは除いています。","6月はDirectが一時的に急増しています（社内アクセス等の可能性）。"] },
+  grandit:{ label:"GRANDIT", desc:"/grandit 配下",
+    ch:{ "Organic Search":[514,561,690,624,613,708], "Direct":[269,234,394,409,562,1436], "Email":[1441,432,269,249,2492,609], "Referral":[189,367,247,172,127,235], "Paid Social":[1,0,0,0,3916,181], "AI Assistant":[0,0,0,0,0,15], "その他":[26,74,140,24,43,24] },
+    notes:["<b>Paid Social（有料SNS広告）とEmailが主力チャネル。</b>特に5月は大型施策でPaid Social 3,916・Email 2,492と跳ねています。"] },
+  sap:{ label:"SAP", desc:"/sap 配下",
+    ch:{ "Organic Search":[68,65,40,49,32,33], "Direct":[29,20,37,31,53,137], "Email":[3,3,1,0,289,70], "Referral":[4,19,4,9,41,30], "Paid Social":[0,0,0,0,1,0], "AI Assistant":[0,0,0,0,0,0], "その他":[0,0,0,1,4,0] },
+    notes:["規模は小さめ。5月にEmail施策（289）で一時的に伸びています。"] },
+  mcframe:{ label:"mcframe", desc:"/mcframe 配下",
+    ch:{ "Organic Search":[34,26,31,36,36,54], "Direct":[27,20,34,24,35,79], "Email":[1,1,0,1,0,1], "Referral":[8,0,6,2,4,4], "Paid Social":[0,0,0,0,0,0], "AI Assistant":[0,0,0,0,0,1], "その他":[1,0,2,1,5,1] },
+    notes:["規模は小さめ。自然検索と直接が中心で、緩やかに増加傾向です。"] },
+  blog:{ label:"台帳ブログ", desc:"SINT-ブログ台帳マスタ 266記事（旧 /backoffice/blog/ ＋ 新 /blog/ を合算）",
+    ch:{ "Organic Search":[5715,5467,5327,5433,4833,5303], "Direct":[505,441,630,611,648,1286], "Email":[2,6,5,0,2,5], "Referral":[117,157,135,173,145,124], "Paid Social":[0,0,0,0,0,0], "AI Assistant":[0,0,0,0,0,32], "その他":[37,13,9,27,31,30] },
+    handoff:{ old:[6376,6084,6106,6244,4982,0], new:[0,0,0,0,677,6780] },
+    notes:["<b>旧URL＋新URLの合算：</b>台帳ブログは 旧 /backoffice/blog/ から 新 /blog/ へ移設。両方を合算し連続した実力値を表示（受け渡しグラフで5→6月の移行が見えます）。","対象は台帳の新URL 266件。台帳で新URLが空欄の記事は対象外です。"] }
 };
+const ORDER = ["backoffice","grandit","sap","mcframe","blog"];
+const COMMON_NOTES = ["<b>社内アクセス未除外：</b>Teams・Zoom・HubSpot管理画面等からの閲覧を含むため、Direct が多めに出ます。","<b>AIアシスタント：</b>GA4ネイティブ判定（ChatGPT/Perplexity/Gemini等）。参照元を持たない流入はDirectに混ざるため過小評価の可能性があります。","当月は月途中のため除外し、完了済みの6ヶ月を表示しています。"];
 
-new Chart(document.getElementById("cHandoff"),{type:"bar",data:{labels:MONTHS,datasets:[
-  {label:"旧URL (/backoffice/blog/)",data:OLD_TOT,backgroundColor:"#9aa3b1"},
-  {label:"新URL (/blog/)",data:NEW_TOT,backgroundColor:"#2f6df6"}
-]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
+let charts = {};
+function nf(n){ return n.toLocaleString("ja-JP"); }
+function totals(ch){ return MONTHS.map((_,i)=>CH_ORDER.reduce((s,c)=>s+(ch[c]?ch[c][i]:0),0)); }
+function momHtml(cur,prev){
+  if(prev===0&&cur===0) return '<span class="flat">前月比 —</span>';
+  if(prev===0) return '<span class="up">前月比 +'+nf(cur)+'</span>';
+  const p=Math.round((cur-prev)/prev*1000)/10, cls=p>0?"up":(p<0?"down":"flat"), sign=p>0?"+":"";
+  return '<span class="'+cls+'">前月比 '+sign+p+'%</span>';
+}
+function destroy(){ Object.values(charts).forEach(c=>c&&c.destroy()); charts={}; }
 
-new Chart(document.getElementById("cStack"),{type:"bar",data:{labels:MONTHS,datasets:CH_ORDER.map((ch,i)=>({label:ch,data:CH_DATA[ch],backgroundColor:CH_COLOR[i]}))},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
+function render(key){
+  const p=PRODUCTS[key];
+  const tot=totals(p.ch);
+  const li=tot.length-1, org=p.ch["Organic Search"], ai=p.ch["AI Assistant"];
+  document.getElementById("sub").innerHTML='products.sint.co.jp ｜ <b>'+p.label+'</b>（'+p.desc+'）｜ 対象期間 <b>2026-01 〜 2026-06</b>（完了済み6ヶ月・当月除く）';
 
-new Chart(document.getElementById("cDonut"),{type:"doughnut",data:{labels:CH_ORDER,datasets:[{data:CH_ORDER.map(ch=>CH_DATA[ch][5]),backgroundColor:CH_COLOR,borderWidth:2,borderColor:"#fff"}]},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right"}},cutout:"55%"}});
+  document.getElementById("kpis").innerHTML=`
+    <div class="card"><div class="label">最新月 (${MONTHS[li]}) 合計セッション</div><div class="val">${nf(tot[li])}</div><div class="mom">${momHtml(tot[li],tot[li-1])}</div></div>
+    <div class="card"><div class="label">うち 自然検索(Organic)</div><div class="val">${nf(org[li])}</div><div class="mom">${momHtml(org[li],org[li-1])}</div></div>
+    <div class="card"><div class="label">うち AIアシスタント流入</div><div class="val">${nf(ai[li])}</div><div class="mom">${momHtml(ai[li],ai[li-1])}</div></div>
+    <div class="card"><div class="label">6ヶ月 合計セッション</div><div class="val">${nf(tot.reduce((a,b)=>a+b,0))}</div><div class="mom flat">2026/01〜06</div></div>`;
+
+  document.getElementById("notes").innerHTML=(p.notes||[]).concat(COMMON_NOTES).map(n=>'<li>'+n+'</li>').join('');
+  document.getElementById("donutTitle").innerHTML='最新月の流入内訳<span class="tag">'+MONTHS[li]+'</span>';
+
+  destroy();
+  const hp=document.getElementById("handoffPanel");
+  if(p.handoff){ hp.style.display=""; charts.handoff=new Chart(document.getElementById("cHandoff"),{type:"bar",data:{labels:MONTHS,datasets:[
+    {label:"旧URL (/backoffice/blog/)",data:p.handoff.old,backgroundColor:"#9aa3b1"},
+    {label:"新URL (/blog/)",data:p.handoff.new,backgroundColor:"#2f6df6"}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}}); }
+  else { hp.style.display="none"; }
+
+  charts.stack=new Chart(document.getElementById("cStack"),{type:"bar",data:{labels:MONTHS,datasets:CH_ORDER.map((c,i)=>({label:c,data:p.ch[c]||[0,0,0,0,0,0],backgroundColor:CH_COLOR[i]}))},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}});
+
+  charts.donut=new Chart(document.getElementById("cDonut"),{type:"doughnut",data:{labels:CH_ORDER,datasets:[{data:CH_ORDER.map(c=>p.ch[c]?p.ch[c][li]:0),backgroundColor:CH_COLOR,borderWidth:2,borderColor:"#fff"}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right"}},cutout:"55%"}});
+
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.key===key));
+}
+
+const tabbar=document.getElementById("tabs");
+ORDER.forEach(k=>{ const b=document.createElement("button"); b.className="tab"; b.dataset.key=k; b.textContent=PRODUCTS[k].label; b.onclick=()=>render(k); tabbar.appendChild(b); });
+render("backoffice");
 </script>
 </body>
 </html>
