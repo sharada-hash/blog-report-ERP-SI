@@ -13,7 +13,7 @@ h1 { font-size:21px; margin:0 0 2px; }
 .sub { color:#6b7686; font-size:12.5px; margin-bottom:6px; }
 .sub b { color:#1c2330; }
 .badge { display:inline-block; font-size:11.5px; color:#5b6472; background:#eef1f6; border:1px solid #e0e5ee; padding:2px 10px; border-radius:20px; margin:2px 0 16px; }
-.tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; border-bottom:2px solid #e6e9ef; padding-bottom:0; }
+.tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; border-bottom:2px solid #e6e9ef; }
 .tab { appearance:none; border:1px solid #e6e9ef; border-bottom:none; background:#eef1f6; color:#5b6472; font-size:13px; font-weight:600; padding:9px 16px; border-radius:9px 9px 0 0; cursor:pointer; position:relative; top:2px; }
 .tab:hover { background:#e4e9f2; }
 .tab.active { background:#fff; color:#1c2330; border-color:#d3d9e4; box-shadow:0 -2px 0 #2f6df6 inset; }
@@ -40,8 +40,8 @@ h1 { font-size:21px; margin:0 0 2px; }
 </head>
 <body>
 <h1>ERP製品サイト 月次モニタリング</h1>
-<div class="sub" id="sub">products.sint.co.jp ｜ GA4より集計 ｜ 対象期間 <b>2026-01 〜 2026-06</b>（完了済み6ヶ月・当月除く）</div>
-<div class="badge">🔒 閲覧専用の共有版 ｜ データ更新日 2026-07-29</div>
+<div class="sub" id="sub">products.sint.co.jp ｜ GA4より集計 ｜ 対象期間 <b>2026-02 〜 2026-07</b>（完了済み6ヶ月・当月除く）</div>
+<div class="badge">🔒 閲覧専用の共有版 ｜ データ更新日 2026-08-18</div>
 
 <div class="tabs" id="tabs"></div>
 <div class="grid-kpi" id="kpis"></div>
@@ -57,30 +57,30 @@ h1 { font-size:21px; margin:0 0 2px; }
 <div class="foot">出典：Google Analytics 4 ／ SINT-ブログ台帳マスタ｜このページはスナップショット（自動更新されません）</div>
 
 <script>
-const MONTHS = ["2026/01","2026/02","2026/03","2026/04","2026/05","2026/06"];
+const MONTHS = ["2026/02","2026/03","2026/04","2026/05","2026/06","2026/07"];
 const CH_ORDER = ["Organic Search","Direct","Email","Referral","Paid Social","AI Assistant","その他"];
 const CH_COLOR = ["#2f6df6","#00b4a6","#f5a524","#a06be0","#3fb56d","#e0567a","#c2c8d2"];
 
 const PRODUCTS = {
   backoffice:{ label:"backoffice", desc:"/backoffice 配下（移設ブログ /backoffice/blog は除外）",
-    ch:{ "Organic Search":[41,32,27,28,16,27], "Direct":[76,45,71,63,65,338], "Email":[33,8,46,6,21,17], "Referral":[19,10,10,6,1,14], "Paid Social":[0,0,0,0,0,0], "AI Assistant":[0,0,0,0,0,0], "その他":[1,11,2,2,4,1] },
-    notes:["<b>移設ブログを除外：</b>/backoffice/blog 配下は「台帳ブログ」タブで別集計しているため、ここでは除いています。","6月はDirectが一時的に急増しています（社内アクセス等の可能性）。"] },
+    ch:{ "Organic Search":[32,27,28,16,27,30], "Direct":[45,71,63,65,338,194], "Email":[8,46,6,21,17,6], "Referral":[10,10,6,1,14,17], "Paid Social":[0,0,0,0,0,0], "AI Assistant":[0,0,0,0,0,0], "その他":[11,2,2,4,1,0] },
+    notes:["<b>移設ブログを除外：</b>/backoffice/blog 配下は「台帳ブログ」タブで別集計しているため、ここでは除いています。","6月はDirectが一時的に急増（社内アクセス等の可能性）。7月は落ち着いています。"] },
   grandit:{ label:"GRANDIT", desc:"/grandit 配下",
-    ch:{ "Organic Search":[514,561,690,624,613,708], "Direct":[269,234,394,409,562,1436], "Email":[1441,432,269,249,2492,609], "Referral":[189,367,247,172,127,235], "Paid Social":[1,0,0,0,3916,181], "AI Assistant":[0,0,0,0,0,15], "その他":[26,74,140,24,43,24] },
-    notes:["<b>Paid Social（有料SNS広告）とEmailが主力チャネル。</b>特に5月は大型施策でPaid Social 3,916・Email 2,492と跳ねています。"] },
+    ch:{ "Organic Search":[561,690,624,613,708,670], "Direct":[234,394,409,562,1436,1144], "Email":[432,269,249,2492,609,156], "Referral":[367,247,172,127,235,149], "Paid Social":[0,0,0,3916,181,0], "AI Assistant":[0,0,0,0,15,14], "その他":[74,140,24,43,24,4] },
+    notes:["<b>Paid Social（有料SNS広告）とEmailが主力チャネル。</b>5月に大型施策でPaid Social 3,916・Email 2,492と跳ね、その後は平常運転に戻っています。"] },
   sap:{ label:"SAP", desc:"/sap 配下",
-    ch:{ "Organic Search":[68,65,40,49,32,33], "Direct":[29,20,37,31,53,137], "Email":[3,3,1,0,289,70], "Referral":[4,19,4,9,41,30], "Paid Social":[0,0,0,0,1,0], "AI Assistant":[0,0,0,0,0,0], "その他":[0,0,0,1,4,0] },
-    notes:["規模は小さめ。5月にEmail施策（289）で一時的に伸びています。"] },
+    ch:{ "Organic Search":[65,40,49,32,33,39], "Direct":[20,37,31,53,137,150], "Email":[3,1,0,289,70,3], "Referral":[19,4,9,41,30,4], "Paid Social":[0,0,0,1,0,0], "AI Assistant":[0,0,0,0,0,2], "その他":[0,0,1,4,0,0] },
+    notes:["規模は小さめ。5月にEmail施策（289）で一時的に伸びました。直近はDirect中心です。"] },
   mcframe:{ label:"mcframe", desc:"/mcframe 配下",
-    ch:{ "Organic Search":[34,26,31,36,36,54], "Direct":[27,20,34,24,35,79], "Email":[1,1,0,1,0,1], "Referral":[8,0,6,2,4,4], "Paid Social":[0,0,0,0,0,0], "AI Assistant":[0,0,0,0,0,1], "その他":[1,0,2,1,5,1] },
-    notes:["規模は小さめ。自然検索と直接が中心で、緩やかに増加傾向です。"] },
+    ch:{ "Organic Search":[26,31,36,36,54,43], "Direct":[20,34,24,35,79,138], "Email":[1,0,1,0,1,0], "Referral":[0,6,2,4,4,2], "Paid Social":[0,0,0,0,0,0], "AI Assistant":[0,0,0,0,1,3], "その他":[0,2,1,5,1,0] },
+    notes:["規模は小さめだが増加傾向。7月はDirectが伸びています。"] },
   blog:{ label:"台帳ブログ", desc:"SINT-ブログ台帳マスタ 266記事（旧 /backoffice/blog/ ＋ 新 /blog/ を合算）",
-    ch:{ "Organic Search":[5715,5467,5327,5433,4833,5303], "Direct":[505,441,630,611,648,1286], "Email":[2,6,5,0,2,5], "Referral":[117,157,135,173,145,124], "Paid Social":[0,0,0,0,0,0], "AI Assistant":[0,0,0,0,0,32], "その他":[37,13,9,27,31,30] },
-    handoff:{ old:[6376,6084,6106,6244,4982,0], new:[0,0,0,0,677,6780] },
-    notes:["<b>旧URL＋新URLの合算：</b>台帳ブログは 旧 /backoffice/blog/ から 新 /blog/ へ移設。両方を合算し連続した実力値を表示（受け渡しグラフで5→6月の移行が見えます）。","対象は台帳の新URL 266件。台帳で新URLが空欄の記事は対象外です。"] }
+    ch:{ "Organic Search":[5467,5327,5433,4833,5303,5777], "Direct":[441,630,611,648,1286,1208], "Email":[6,5,0,2,5,4], "Referral":[157,135,173,145,124,174], "Paid Social":[0,0,0,0,0,0], "AI Assistant":[0,0,0,0,32,41], "その他":[13,9,27,31,30,16] },
+    handoff:{ old:[6084,6106,6244,4982,0,0], new:[0,0,0,677,6780,7220] },
+    notes:["<b>旧URL＋新URLの合算：</b>台帳ブログは 旧 /backoffice/blog/ から 新 /blog/ へ移設。両方を合算し連続した実力値を表示（5→6月で受け渡し、7月は新URLに完全定着）。","<b>7月は7,220で過去最高。</b>対象は台帳の新URL 266件。台帳で新URLが空欄の記事は対象外です。"] }
 };
 const ORDER = ["backoffice","grandit","sap","mcframe","blog"];
-const COMMON_NOTES = ["<b>社内アクセス未除外：</b>Teams・Zoom・HubSpot管理画面等からの閲覧を含むため、Direct が多めに出ます。","<b>AIアシスタント：</b>GA4ネイティブ判定（ChatGPT/Perplexity/Gemini等）。参照元を持たない流入はDirectに混ざるため過小評価の可能性があります。","当月は月途中のため除外し、完了済みの6ヶ月を表示しています。"];
+const COMMON_NOTES = ["<b>社内アクセス未除外：</b>Teams・Zoom・HubSpot管理画面等からの閲覧を含むため、Direct が多めに出ます。","<b>AIアシスタント：</b>GA4ネイティブ判定（ChatGPT/Perplexity/Gemini等）。参照元を持たない流入はDirectに混ざるため過小評価の可能性があります。","当月（8月）は月途中のため除外し、完了済みの6ヶ月を表示しています。"];
 
 let charts = {};
 function nf(n){ return n.toLocaleString("ja-JP"); }
@@ -97,13 +97,13 @@ function render(key){
   const p=PRODUCTS[key];
   const tot=totals(p.ch);
   const li=tot.length-1, org=p.ch["Organic Search"], ai=p.ch["AI Assistant"];
-  document.getElementById("sub").innerHTML='products.sint.co.jp ｜ <b>'+p.label+'</b>（'+p.desc+'）｜ 対象期間 <b>2026-01 〜 2026-06</b>（完了済み6ヶ月・当月除く）';
+  document.getElementById("sub").innerHTML='products.sint.co.jp ｜ <b>'+p.label+'</b>（'+p.desc+'）｜ 対象期間 <b>2026-02 〜 2026-07</b>（完了済み6ヶ月・当月除く）';
 
   document.getElementById("kpis").innerHTML=`
     <div class="card"><div class="label">最新月 (${MONTHS[li]}) 合計セッション</div><div class="val">${nf(tot[li])}</div><div class="mom">${momHtml(tot[li],tot[li-1])}</div></div>
     <div class="card"><div class="label">うち 自然検索(Organic)</div><div class="val">${nf(org[li])}</div><div class="mom">${momHtml(org[li],org[li-1])}</div></div>
     <div class="card"><div class="label">うち AIアシスタント流入</div><div class="val">${nf(ai[li])}</div><div class="mom">${momHtml(ai[li],ai[li-1])}</div></div>
-    <div class="card"><div class="label">6ヶ月 合計セッション</div><div class="val">${nf(tot.reduce((a,b)=>a+b,0))}</div><div class="mom flat">2026/01〜06</div></div>`;
+    <div class="card"><div class="label">6ヶ月 合計セッション</div><div class="val">${nf(tot.reduce((a,b)=>a+b,0))}</div><div class="mom flat">2026/02〜07</div></div>`;
 
   document.getElementById("notes").innerHTML=(p.notes||[]).concat(COMMON_NOTES).map(n=>'<li>'+n+'</li>').join('');
   document.getElementById("donutTitle").innerHTML='最新月の流入内訳<span class="tag">'+MONTHS[li]+'</span>';
