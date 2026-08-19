@@ -16,24 +16,31 @@ h1 { font-size:21px; margin:0 0 2px; }
 .tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; border-bottom:2px solid #e6e9ef; }
 .tab { appearance:none; border:1px solid #e6e9ef; border-bottom:none; background:#eef1f6; color:#5b6472; font-size:13px; font-weight:600; padding:9px 16px; border-radius:9px 9px 0 0; cursor:pointer; position:relative; top:2px; }
 .tab:hover { background:#e4e9f2; }
-.tab.active { background:#fff; color:#1c2330; border-color:#d3d9e4; box-shadow:0 -2px 0 #2f6df6 inset; }
+.tab.active { background:#fff; color:#1c2330; border-color:#d3d9e4; box-shadow:inset 0 -2px 0 #2f6df6; }
 .grid-kpi { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
 .card { background:#fff; border:1px solid #e6e9ef; border-radius:12px; padding:14px 16px; }
 .card .label { font-size:12px; color:#6b7686; margin-bottom:4px; }
 .card .val { font-size:25px; font-weight:700; }
 .card .mom { font-size:12px; margin-top:2px; }
 .up { color:#1a8a5a; } .down { color:#c0392b; } .flat { color:#8a94a3; }
+.secLabel { font-size:11px; font-weight:700; letter-spacing:.04em; color:#9aa3b1; margin:20px 0 8px; }
 .panel { background:#fff; border:1px solid #e6e9ef; border-radius:12px; padding:16px 18px; margin-bottom:16px; }
 .panel h2 { font-size:14px; margin:0 0 12px; display:flex; align-items:center; gap:8px; }
 .panel h2 .tag { font-size:11px; font-weight:600; color:#5b6472; background:#eef1f6; padding:2px 8px; border-radius:20px; }
 .row2 { display:grid; grid-template-columns:1.5fr 1fr; gap:16px; }
 .chart-wrap { position:relative; height:280px; }
-.chart-wrap.sm { height:240px; }
-.notes { background:#fff8ec; border:1px solid #f0dfb8; border-radius:12px; padding:14px 18px; font-size:12.5px; }
+.chart-wrap.sm { position:relative; height:240px; }
+.lp-row { display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:6px 0; border-top:0.5px solid #eef0f4; }
+.lp-row:first-child { border-top:none; }
+.lp-row .p { color:#1c2330; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.lp-row .n { color:#5b6472; font-variant-numeric:tabular-nums; }
+.lp-row .bar { height:6px; background:#2f6df6; border-radius:4px; align-self:center; }
+.notes { background:#fff8ec; border:1px solid #f0dfb8; border-radius:12px; padding:14px 18px; font-size:12.5px; margin-top:16px; }
 .notes h2 { font-size:13px; margin:0 0 8px; color:#8a6d1e; }
 .notes ul { margin:0; padding-left:18px; }
 .notes li { margin-bottom:5px; }
 .notes b { color:#7a5c12; }
+.soon { background:#eef2fb; border:1px dashed #b9c8ec; color:#3a5aa6; border-radius:10px; padding:10px 14px; font-size:12px; margin-top:12px; }
 .foot { color:#9aa3b1; font-size:11.5px; margin-top:18px; text-align:right; }
 @media (max-width:760px){ .grid-kpi{grid-template-columns:repeat(2,1fr);} .row2{grid-template-columns:1fr;} }
 </style>
@@ -41,9 +48,11 @@ h1 { font-size:21px; margin:0 0 2px; }
 <body>
 <h1>ERP製品サイト 月次モニタリング</h1>
 <div class="sub" id="sub">products.sint.co.jp ｜ GA4より集計 ｜ 対象期間 <b>2026-02 〜 2026-07</b>（完了済み6ヶ月・当月除く）</div>
-<div class="badge">🔒 閲覧専用の共有版 ｜ データ更新日 2026-08-18</div>
+<div class="badge">🔒 閲覧専用の共有版 ｜ 更新 2026-08-19（GA4: 2〜7月 ／ GSC: 過去6ヶ月）</div>
 
 <div class="tabs" id="tabs"></div>
+
+<div class="secLabel">サマリ</div>
 <div class="grid-kpi" id="kpis"></div>
 
 <div class="panel" id="handoffPanel" style="display:none"><h2>月次セッション（旧URL / 新URL の受け渡し）<span class="tag">移設の可視化</span></h2><div class="chart-wrap"><canvas id="cHandoff"></canvas></div></div>
@@ -51,6 +60,21 @@ h1 { font-size:21px; margin:0 0 2px; }
 <div class="row2">
   <div class="panel"><h2>流入チャネル構成の推移<span class="tag">6ヶ月</span></h2><div class="chart-wrap"><canvas id="cStack"></canvas></div></div>
   <div class="panel"><h2 id="donutTitle">最新月の流入内訳</h2><div class="chart-wrap sm"><canvas id="cDonut"></canvas></div></div>
+</div>
+
+<div class="secLabel">集客の深掘り</div>
+<div class="row2">
+  <div class="panel"><h2 id="lpTitle">人気LP（GA4）<span class="tag">最新月・セッション</span></h2><div id="lpList"></div></div>
+  <div class="panel"><h2>AIアシスタント参照元<span class="tag">最新月</span></h2><div id="aiList"></div></div>
+</div>
+<div class="panel"><h2>検索パフォーマンス（GSC・ページ別）<span class="tag">過去6ヶ月</span></h2>
+  <div id="gscKpi" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px"></div>
+  <div style="font-size:12px;color:#9aa3b1;margin-bottom:6px">上位ページ（クリック／掲載順位）</div>
+  <div id="gscList"></div>
+</div>
+<div class="panel"><h2>上位検索クエリ（GSC）<span class="tag">過去6ヶ月</span></h2>
+  <div style="font-size:12px;color:#9aa3b1;margin-bottom:6px">クエリ（クリック／CTR／掲載順位）</div>
+  <div id="gscqList"></div>
 </div>
 
 <div class="notes"><h2>⚠ 数字を読むときの注意</h2><ul id="notes"></ul></div>
@@ -64,23 +88,50 @@ const CH_COLOR = ["#2f6df6","#00b4a6","#f5a524","#a06be0","#3fb56d","#e0567a","#
 const PRODUCTS = {
   backoffice:{ label:"backoffice", desc:"/backoffice 配下（移設ブログ /backoffice/blog は除外）",
     ch:{ "Organic Search":[32,27,28,16,27,30], "Direct":[45,71,63,65,338,194], "Email":[8,46,6,21,17,6], "Referral":[10,10,6,1,14,17], "Paid Social":[0,0,0,0,0,0], "AI Assistant":[0,0,0,0,0,0], "その他":[11,2,2,4,1,0] },
-    notes:["<b>移設ブログを除外：</b>/backoffice/blog 配下は「台帳ブログ」タブで別集計しているため、ここでは除いています。","6月はDirectが一時的に急増（社内アクセス等の可能性）。7月は落ち着いています。"] },
+    nu:[322,174],
+    lp:[["/backoffice",174],["/backoffice/resource",27],["/backoffice/resource/f2s_risk_success",15],["/backoffice/resource/future-oriented_management_strategy",8],["/backoffice/resource/ai_erp",7],["/backoffice/inquiry",6]],
+    notes:["<b>移設ブログを除外：</b>/backoffice/blog 配下は「台帳ブログ」タブで別集計。","6月はDirectが一時急増（社内アクセス等の可能性）。7月は平常に。","AI流入はほぼ0。"] },
   grandit:{ label:"GRANDIT", desc:"/grandit 配下",
     ch:{ "Organic Search":[561,690,624,613,708,670], "Direct":[234,394,409,562,1436,1144], "Email":[432,269,249,2492,609,156], "Referral":[367,247,172,127,235,149], "Paid Social":[0,0,0,3916,181,0], "AI Assistant":[0,0,0,0,15,14], "その他":[74,140,24,43,24,4] },
-    notes:["<b>Paid Social（有料SNS広告）とEmailが主力チャネル。</b>5月に大型施策でPaid Social 3,916・Email 2,492と跳ね、その後は平常運転に戻っています。"] },
+    nu:[2372,1659],
+    lp:[["/grandit",343],["/grandit/product/ai-connect",131],["/grandit/seminar/20260825",99],["/grandit/resource/erp_hikaku",54],["/grandit/resource/saas-erp-hikaku",53],["/grandit/strength",50]],
+    notes:["<b>Paid Social（有料SNS）とEmailが主力。</b>5月に大型施策（Paid Social 3,916・Email 2,492）、その後は平常運転。","7月はセミナー告知(/grandit/seminar/20260825)や製品ページ(ai-connect)が集客に貢献。","AIアシスタント流入は月14前後。"] },
   sap:{ label:"SAP", desc:"/sap 配下",
     ch:{ "Organic Search":[65,40,49,32,33,39], "Direct":[20,37,31,53,137,150], "Email":[3,1,0,289,70,3], "Referral":[19,4,9,41,30,4], "Paid Social":[0,0,0,1,0,0], "AI Assistant":[0,0,0,0,0,2], "その他":[0,0,1,4,0,0] },
-    notes:["規模は小さめ。5月にEmail施策（289）で一時的に伸びました。直近はDirect中心です。"] },
+    nu:[175,176],
+    lp:[["/sap",119],["/sap/case/safie",11],["/sap/resource",10],["/sap/features/bestpractice",9],["/sap/product",8],["/sap/case",7]],
+    notes:["規模は小さめ。5月にEmail施策（289）で一時的に伸長。","流入の大半はトップページ(/sap)。下層ページの集客は今後の課題。"] },
   mcframe:{ label:"mcframe", desc:"/mcframe 配下",
     ch:{ "Organic Search":[26,31,36,36,54,43], "Direct":[20,34,24,35,79,138], "Email":[1,0,1,0,1,0], "Referral":[0,6,2,4,4,2], "Paid Social":[0,0,0,0,0,0], "AI Assistant":[0,0,0,0,1,3], "その他":[0,2,1,5,1,0] },
-    notes:["規模は小さめだが増加傾向。7月はDirectが伸びています。"] },
+    nu:[110,163],
+    lp:[["/mcframe",154],["/mcframe/function",14],["/mcframe/use-case",7],["/mcframe/inquiry",6],["/mcframe/resource/catalog",5]],
+    notes:["規模は小さめだが新規ユーザーは増加傾向。7月はDirectが伸長。","流入はトップページ集中。機能・事例ページへの導線が伸びしろ。"] },
   blog:{ label:"台帳ブログ", desc:"SINT-ブログ台帳マスタ 266記事（旧 /backoffice/blog/ ＋ 新 /blog/ を合算）",
     ch:{ "Organic Search":[5467,5327,5433,4833,5303,5777], "Direct":[441,630,611,648,1286,1208], "Email":[6,5,0,2,5,4], "Referral":[157,135,173,145,124,174], "Paid Social":[0,0,0,0,0,0], "AI Assistant":[0,0,0,0,32,41], "その他":[13,9,27,31,30,16] },
     handoff:{ old:[6084,6106,6244,4982,0,0], new:[0,0,0,677,6780,7220] },
-    notes:["<b>旧URL＋新URLの合算：</b>台帳ブログは 旧 /backoffice/blog/ から 新 /blog/ へ移設。両方を合算し連続した実力値を表示（5→6月で受け渡し、7月は新URLに完全定着）。","<b>7月は7,220で過去最高。</b>対象は台帳の新URL 266件。台帳で新URLが空欄の記事は対象外です。"] }
+    nu:[5833,6191],
+    lp:[["/blog/addition",563],["/blog/erp-products-comparison",304],["/blog/erp-tool-comparison",268],["/blog/roic",263],["/blog/fabless",231],["/blog/need-for-a-trading-company",209],["/blog/capex-opex",206],["/blog/equipment-work",174]],
+    notes:["<b>旧URL＋新URLの合算：</b>旧 /backoffice/blog/ → 新 /blog/ へ移設。7月は新URLに完全定着し、合計 7,220 で過去最高。","<b>AI参照元（7月・台帳ブログ）：</b>AIアシスタント計 41。大半が ChatGPT（openai）、一部 Perplexity。","<b>SEO改善余地：</b>検索は表示260万・平均8.9位ながらCTR0.72%と低め。タイトル/説明文の改善でクリック増の余地が大きい。","対象は台帳の新URL 266件。新URL空欄の記事は対象外。"] }
+};
+const GSC = {
+  backoffice:{ c:59, i:2779, ctr:2.12, pos:12.3, top:[["/backoffice",59,12.3]] },
+  grandit:{ c:1177, i:62596, ctr:1.88, pos:11.1, top:[["/grandit",288,5.4],["/grandit/product/ai-connect",151,5.9],["/grandit/product/system",112,7.8],["/grandit/faq",89,5.7],["/grandit/price",73,24.7],["/grandit/product/manufacture",42,14.9]] },
+  sap:{ c:76, i:4018, ctr:1.89, pos:17.8, top:[["/sap",44,18.4],["/sap/features/bestpractice",32,17.3]] },
+  mcframe:{ c:120, i:19093, ctr:0.63, pos:8.9, top:[["/mcframe",120,8.9]] },
+  blog:{ c:18973, i:2635452, ctr:0.72, pos:8.9, top:[["/blog/addition",2341,4.7],["/blog/roic",1210,7.3],["/blog/need-for-a-trading-company",1110,6.4],["/blog/erp-products-comparison",897,11.3],["/blog/erp-tool-comparison",876,10.3],["/blog/sap-fiori",869,5.4]] }
+};
+const AISRC = {
+  blog:[["ChatGPT",39],["Perplexity",2]],
+  grandit:[["ChatGPT等",14]],
+  mcframe:[["ChatGPT等",3]],
+  sap:[["ChatGPT等",2]]
+};
+const GSCQ = {
+  blog:[["roi roic 違い",198,"14.5%",1.2],["原価計算 アプリ",150,"5.0%",3.8],["sap fiori とは",120,"27.8%",1.5],["国産erp",118,"35.5%",1.4],["ファブレス企業",117,"0.9%",3.1],["erp 種類",100,"6.2%",11.0],["erp 比較",78,"1.0%",16.3],["原価率",71,"0.2%",5.1],["erp",70,"0.4%",12.8],["基幹業務とは",70,"2.5%",2.2]],
+  grandit:[["grandit（指名検索）",111,"0.7%",4.5]]
 };
 const ORDER = ["backoffice","grandit","sap","mcframe","blog"];
-const COMMON_NOTES = ["<b>社内アクセス未除外：</b>Teams・Zoom・HubSpot管理画面等からの閲覧を含むため、Direct が多めに出ます。","<b>AIアシスタント：</b>GA4ネイティブ判定（ChatGPT/Perplexity/Gemini等）。参照元を持たない流入はDirectに混ざるため過小評価の可能性があります。","当月（8月）は月途中のため除外し、完了済みの6ヶ月を表示しています。"];
+const COMMON_NOTES = ["<b>社内アクセス未除外：</b>Teams・Zoom・HubSpot管理画面等を含むため Direct が多めに出ます。","<b>AIアシスタント：</b>GA4ネイティブ判定。参照元を持たない流入はDirectに混ざり過小評価の可能性。","当月（8月）は月途中のため除外し、完了済み6ヶ月を表示。"];
 
 let charts = {};
 function nf(n){ return n.toLocaleString("ja-JP"); }
@@ -102,11 +153,40 @@ function render(key){
   document.getElementById("kpis").innerHTML=`
     <div class="card"><div class="label">最新月 (${MONTHS[li]}) 合計セッション</div><div class="val">${nf(tot[li])}</div><div class="mom">${momHtml(tot[li],tot[li-1])}</div></div>
     <div class="card"><div class="label">うち 自然検索(Organic)</div><div class="val">${nf(org[li])}</div><div class="mom">${momHtml(org[li],org[li-1])}</div></div>
-    <div class="card"><div class="label">うち AIアシスタント流入</div><div class="val">${nf(ai[li])}</div><div class="mom">${momHtml(ai[li],ai[li-1])}</div></div>
-    <div class="card"><div class="label">6ヶ月 合計セッション</div><div class="val">${nf(tot.reduce((a,b)=>a+b,0))}</div><div class="mom flat">2026/02〜07</div></div>`;
+    <div class="card"><div class="label">新規ユーザー</div><div class="val">${nf(p.nu[1])}</div><div class="mom">${momHtml(p.nu[1],p.nu[0])}</div></div>
+    <div class="card"><div class="label">AIアシスタント流入</div><div class="val">${nf(ai[li])}</div><div class="mom">${momHtml(ai[li],ai[li-1])}</div></div>`;
 
   document.getElementById("notes").innerHTML=(p.notes||[]).concat(COMMON_NOTES).map(n=>'<li>'+n+'</li>').join('');
   document.getElementById("donutTitle").innerHTML='最新月の流入内訳<span class="tag">'+MONTHS[li]+'</span>';
+  document.getElementById("lpTitle").innerHTML='人気ランディングページ<span class="tag">'+MONTHS[li]+'・セッション</span>';
+
+  const maxlp=Math.max(...p.lp.map(x=>x[1]));
+  document.getElementById("lpList").innerHTML=p.lp.map(([path,n])=>`
+    <div class="lp-row"><span class="p" title="${path}">${path}</span>
+      <span style="display:flex;align-items:center;gap:8px"><span class="bar" style="width:${Math.round(n/maxlp*90)+10}px"></span><span class="n">${nf(n)}</span></span></div>`).join('');
+
+  const g=GSC[key];
+  document.getElementById("gscKpi").innerHTML=`
+    <div style="background:#f6f7f9;border-radius:8px;padding:8px 10px"><div style="font-size:11px;color:#6b7686">クリック</div><div style="font-size:18px;font-weight:700">${nf(g.c)}</div></div>
+    <div style="background:#f6f7f9;border-radius:8px;padding:8px 10px"><div style="font-size:11px;color:#6b7686">表示回数</div><div style="font-size:18px;font-weight:700">${nf(g.i)}</div></div>
+    <div style="background:#f6f7f9;border-radius:8px;padding:8px 10px"><div style="font-size:11px;color:#6b7686">CTR</div><div style="font-size:18px;font-weight:700">${g.ctr}%</div></div>
+    <div style="background:#f6f7f9;border-radius:8px;padding:8px 10px"><div style="font-size:11px;color:#6b7686">平均掲載順位</div><div style="font-size:18px;font-weight:700">${g.pos}</div></div>`;
+  const maxg=Math.max(...g.top.map(x=>x[1]));
+  document.getElementById("gscList").innerHTML=g.top.map(([path,c,pos])=>`
+    <div class="lp-row"><span class="p" title="${path}">${path}</span>
+      <span style="display:flex;align-items:center;gap:8px"><span style="font-size:11px;color:#9aa3b1">${pos}位</span><span class="bar" style="background:#639922;width:${Math.round(c/maxg*80)+10}px"></span><span class="n">${nf(c)}</span></span></div>`).join('');
+
+  const asrc=AISRC[key];
+  document.getElementById("aiList").innerHTML = asrc
+    ? asrc.map(([name,v])=>`<div class="lp-row"><span class="p">${name}</span><span class="n">${nf(v)}</span></div>`).join('') + (key==="blog"?'<div style="font-size:11px;color:#9aa3b1;margin-top:8px">※ChatGPT/Perplexityの比率はサイト全体比からの概算</div>':'')
+    : '<div style="font-size:12.5px;color:#9aa3b1;padding:8px 0">この期間のAIアシスタント流入はほぼ0でした。</div>';
+
+  const gq=GSCQ[key];
+  document.getElementById("gscqList").innerHTML = gq
+    ? gq.map(([q,c,ctr,pos])=>`<div class="lp-row"><span class="p" title="${q}">${q}</span>
+        <span style="display:flex;align-items:center;gap:10px"><span style="font-size:11px;color:#9aa3b1">CTR ${ctr}</span><span style="font-size:11px;color:#9aa3b1">${pos}位</span><span class="n">${nf(c)}</span></span></div>`).join('')
+        + (key==="blog"?'<div class="soon"><i>これはサイト全体からERP関連語を抽出したものです。製品ページ単位のクエリは、GSCで各製品パスに絞ってエクスポートすれば精緻化できます。</i></div>':'')
+    : '<div class="soon"><i>このタブの製品ページ単位クエリは、GSCで該当パス（例: '+PRODUCTS[key].desc.replace(/（.*/,'')+'）に絞ってエクスポートしたCSVが必要です。次回もらえれば反映します。</i></div>';
 
   destroy();
   const hp=document.getElementById("handoffPanel");
